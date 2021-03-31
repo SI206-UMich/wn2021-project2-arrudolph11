@@ -7,49 +7,37 @@ import unittest
 
 
 def get_titles_from_search_results(filename):
-    """
-    Write a function that creates a BeautifulSoup object on "search_results.htm". Parse
-    through the object and return a list of tuples containing book titles (as printed on the Goodreads website) 
-    and authors in the format given below. Make sure to strip() any newlines from the book titles and author names.
-
-    [('Book title 1', 'Author 1'), ('Book title 2', 'Author 2')...]
-    """
-
-    pass
+    soup = BeautifulSoup(open('search_results.htm'), 'html.parser')
+    books = []
+    for book in soup.findAll('tr', itemtype = "http://schema.org/Book"):
+        items = book.findAll('span', itemprop = 'name')
+        title = items[0].string.strip()
+        author = items[1].string.strip()
+        books.append((title, author))
+    return books
 
 
 def get_search_links():
-    """
-    Write a function that creates a BeautifulSoup object after retrieving content from
-    "https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc". Parse through the object and return a list of
-    URLs for each of the first ten books in the search using the following format:
-
-    ['https://www.goodreads.com/book/show/84136.Fantasy_Lover?from_search=true&from_srp=true&qid=NwUsLiA2Nc&rank=1', ...]
-
-    Notice that you should ONLY add URLs that start with "https://www.goodreads.com/book/show/" to 
-    your list, and , and be sure to append the full path to the URL so that the url is in the format 
-    “https://www.goodreads.com/book/show/kdkd".
-
-    """
-
-    pass
+    list_of_urls = []
+    url = 'https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc'
+    resp = requests.get(url)
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    books = soup.find_all('a', class_ = 'bookTitle', itemprop = 'url')
+    for book in books:
+        b = book['href']
+        if b.startswith('/book/show/'):
+            sites = 'https://www.goodreads.com' + str(b)
+            list_of_urls.append(sites)
+    return list_of_urls[:10]
 
 
 def get_book_summary(book_url):
-    """
-    Write a function that creates a BeautifulSoup object that extracts book
-    information from a book's webpage, given the URL of the book. Parse through
-    the BeautifulSoup object, and capture the book title, book author, and number 
-    of pages. This function should return a tuple in the following format:
-
-    ('Some book title', 'the book's author', number of pages)
-
-    HINT: Using BeautifulSoup's find() method may help you here.
-    You can easily capture CSS selectors with your browser's inspector window.
-    Make sure to strip() any newlines from the book title and number of pages.
-    """
-
-    pass
+    resp = requests.get(book_url)
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    t = soup.find('h1', id = "bookTitle").string.strip()
+    a = soup.find('a', {'class' : 'authorName'}).string.strip()
+    pages = int(soup.find('span', itemprop = "numberOfPages").string.strip(" pages"))
+    return(t, a, pages)
 
 
 def summarize_best_books(filepath):
@@ -105,16 +93,18 @@ class TestCases(unittest.TestCase):
 
     def test_get_titles_from_search_results(self):
         # call get_titles_from_search_results() on search_results.htm and save to a local variable
-
+        lst_of_title = get_titles_from_search_results("search_results.htm")
         # check that the number of titles extracted is correct (20 titles)
-
+        self.assertEqual(len(lst_of_title), 20)
         # check that the variable you saved after calling the function is a list
-
+        self.assertIsInstance(lst_of_title, list)
         # check that each item in the list is a tuple
-
+        for title in lst_of_title:
+            self.assertIsInstance(title,tuple)
         # check that the first book and author tuple is correct (open search_results.htm and find it)
-
+        self.assertEqual(lst_of_title[0], ('Harry Potter and the Deathly Hallows (Harry Potter, #7)','J.K. Rowling'))
         # check that the last title is correct (open search_results.htm and find it)
+        self.assertEqual(lst_of_title[-1], ('Harry Potter: The Prequel (Harry Potter, #0.5)', 'J.K. Rowling'))
 
     def test_get_search_links(self):
         # check that TestCases.search_urls is a list
