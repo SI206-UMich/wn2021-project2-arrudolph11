@@ -69,7 +69,6 @@ def get_book_summary(book_url):
     Make sure to strip() any newlines from the book title and number of pages.
     """
     response = requests.get(book_url)
-    summaries = [] # don't need this list anymore
     if response.ok:
         soup = BeautifulSoup(response.content, 'html.parser')
         title = soup.find(id = 'bookTitle').text.strip()
