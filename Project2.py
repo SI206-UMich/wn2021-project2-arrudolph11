@@ -1,3 +1,8 @@
+#Your Name: Amanda Rudolph
+#Your student id: 87253704
+#Your Email: arrud@umich.edu
+#List who you worked with on this homework: Christina Liggio, Andie Carrol
+
 from bs4 import BeautifulSoup
 import requests
 import re
@@ -64,12 +69,14 @@ def get_book_summary(book_url):
     Make sure to strip() any newlines from the book title and number of pages.
     """
     response = requests.get(book_url)
+    summaries = [] # don't need this list anymore
     if response.ok:
         soup = BeautifulSoup(response.content, 'html.parser')
         title = soup.find(id = 'bookTitle').text.strip()
         author = soup.find('a', class_ = 'authorName').text.strip()
         pages = soup.find('span', itemprop = 'numberOfPages').text.strip()
-        summary = (title, author, pages)
+        pages = pages.replace(' pages', '')
+        summary = (title, author, int(pages))
     return summary
 
 
@@ -174,7 +181,7 @@ class TestCases(unittest.TestCase):
         for i in TestCases.search_urls: 
             summaries.append(get_book_summary(i))
         #check that the number of book summaries is correct (10)
-            self.assertEqual(len(summaries), 10)
+        self.assertEqual(len(summaries), 10)
         # check that each item in the list is a tuple
         for i in summaries:
             self.assertTrue(type(i) is tuple)
@@ -184,7 +191,7 @@ class TestCases(unittest.TestCase):
             self.assertTrue(type(i[0]) is str)
             self.assertTrue(type(i[1]) is str)
             #check that the third element in the tuple, i.e. pages is an int
-            self.assertTrue(type(i[2]) is int)
+            self.assertTrue(type(i[2]) is int) 
         # check that the first book in the search has 337 pages
         self.assertEqual(summaries[0][2], 337)
 
