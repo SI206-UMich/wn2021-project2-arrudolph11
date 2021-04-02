@@ -1,7 +1,7 @@
 #Your Name: Amanda Rudolph
 #Your student id: 87253704
 #Your Email: arrud@umich.edu
-#List who you worked with on this homework: Christina Liggio, Andie Carrol
+#List who you worked with on this homework: Claire Weadock, Christina Liggio
 
 from bs4 import BeautifulSoup
 import requests
@@ -69,6 +69,7 @@ def get_book_summary(book_url):
     Make sure to strip() any newlines from the book title and number of pages.
     """
     response = requests.get(book_url)
+    summaries = []
     if response.ok:
         soup = BeautifulSoup(response.content, 'html.parser')
         title = soup.find(id = 'bookTitle').text.strip()
@@ -76,7 +77,7 @@ def get_book_summary(book_url):
         pages = soup.find('span', itemprop = 'numberOfPages').text.strip()
         pages = pages.replace(' pages', '')
         summary = (title, author, int(pages))
-    return summary
+        return summary
 
 
 def summarize_best_books(filepath):
@@ -132,14 +133,23 @@ def write_csv(data, filename):
             file.write(','.join(line) + '\n')
 
 
-def extra_credit(filepath):
-    """
-    EXTRA CREDIT
+# def extra_credit(filepath):
+#     """
+#     EXTRA CREDIT
 
-    Please see the instructions document for more information on how to complete this function.
-    You do not have to write test cases for this function.
-    """
-    pass
+#     Please see the instructions document for more information on how to complete this function.
+#     You do not have to write test cases for this function.
+#     """
+#     soup = BeautifulSoup(fp, filepath) #create Beautiful Soup object from the filepath
+#     entities_list = [] #empty entitiies list
+#     data = soup.findAll('div', class_ = 'entity') #not sure how to extract the description?
+#     for n in range(len(data):
+#         if len(data[n]) >= 3: #statement assessing that length of word is at least 3
+#             if data[n] === data[n].upper and data[n+1] == data[n+1].upper():
+#                 entities_list.append("Named Entity" + str(n) + data[n])
+#                 entities_list.append("Named Entity" + str(n) + data[n+1])
+#                 #need to create if statement to assess whether the words are seperated by spaces
+# pass
 
 class TestCases(unittest.TestCase):
 
@@ -219,24 +229,24 @@ class TestCases(unittest.TestCase):
         dir = os.path.dirname(__file__)
         searchy = get_titles_from_search_results(dir)
         # call write csv on the variable you saved and 'test.csv'
-        write_csv(searchy, "search_results.csv")
+        #write_csv(searchy, "search_results.csv")
+        write_csv(searchy, "test.csv")
         # read in the csv that you wrote (create a variable csv_lines - a list containing all the lines in the csv you just wrote to above)
-        inFile = open(os.path.join(dir, "search_results.csv"), "r")
-        liney = inFile.readlines()
-
+        #inFile = open(os.path.join(dir, "search_results.csv"), "r")
+        inFile = open(os.path.join(dir, "test.csv"), "r")
+        csv_lines = inFile.readlines()
         # check that there are 21 lines in the csv
-        self.assertEqual(len(liney), 21)
+        self.assertEqual(len(csv_lines), 21)
         #check that the header row is correct
-        self.assertEqual(liney[0].strip(), "Book title,Author Name")
+        self.assertEqual(csv_lines[0].strip(), "Book title,Author Name")
         #check that the next row is 'Harry Potter and the Deathly Hallows (Harry Potter, #7)', 'J.K. Rowling'
-        self.assertEqual(liney[1].strip(),"Harry Potter and the Deathly Hallows (Harry Potter, #7),J.K. Rowling", 'https://www.goodreads.com/search?q=harry+potter&qid=BZS10AykFo')
+        self.assertEqual(csv_lines[1].strip(),"Harry Potter and the Deathly Hallows (Harry Potter, #7),J.K. Rowling", 'https://www.goodreads.com/search?q=harry+potter&qid=BZS10AykFo')
         #check that the last row is 'Harry Potter: The Prequel (Harry Potter, #0.5)', 'J.K. Rowling'
-        self.assertEqual(liney[-1].strip(),"Harry Potter: The Prequel (Harry Potter, #0.5),J.K. Rowling")
+        self.assertEqual(csv_lines[-1].strip(),"Harry Potter: The Prequel (Harry Potter, #0.5),J.K. Rowling")
 
 
 
 if __name__ == '__main__':
     #print(extra_credit("extra_credit.htm"))
     unittest.main(verbosity=2)
-
 
