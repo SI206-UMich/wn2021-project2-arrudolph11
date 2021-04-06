@@ -133,23 +133,24 @@ def write_csv(data, filename):
             file.write(','.join(line) + '\n')
 
 
-# def extra_credit(filepath):
-#     """
-#     EXTRA CREDIT
+def extra_credit(filepath):
+    """
+    EXTRA CREDIT
 
-#     Please see the instructions document for more information on how to complete this function.
-#     You do not have to write test cases for this function.
-#     """
-#     soup = BeautifulSoup(fp, filepath) #create Beautiful Soup object from the filepath
-#     entities_list = [] #empty entitiies list
-#     data = soup.findAll('div', class_ = 'entity') #not sure how to extract the description?
-#     for n in range(len(data):
-#         if len(data[n]) >= 3: #statement assessing that length of word is at least 3
-#             if data[n] === data[n].upper and data[n+1] == data[n+1].upper():
-#                 entities_list.append("Named Entity" + str(n) + data[n])
-#                 entities_list.append("Named Entity" + str(n) + data[n+1])
-#                 #need to create if statement to assess whether the words are seperated by spaces
-# pass
+    Please see the instructions document for more information on how to complete this function.
+    You do not have to write test cases for this function.
+    """
+    filey = open(filepath, 'r')
+    read_file = filey.read()
+    filey.close()
+    entities_lst = []
+    soup = BeautifulSoup(read_file, 'lxml')
+    anchor = soup.find('div', class_ = 'readable stacked').find('span', id = 'freeText4791443123668479528').text
+    regexp = re.findall(r'\b(?:[A-Z]\w{2,}) (?:[A-Z]\w+)(?: (?:[A-Z]\w*))*', anchor)
+    for x in regexp:
+        entities_lst.append(x)
+    return entities_lst
+
 
 class TestCases(unittest.TestCase):
 
